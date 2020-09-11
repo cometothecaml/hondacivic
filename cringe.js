@@ -6,14 +6,10 @@ element3.hidden=true
 if (typeof(window.ethereum) === "undefined"){
     nometamaskwarn()
 }
-if (typeof(window.ethereum) !== "undefined"&& window.ethereum.isConnected === true){
-    walletConnected()
-}
 document.getElementById("con").addEventListener("click", function(){console.log("connect attempt"); attemptConnect();});
 async function attemptConnect(){
     try{
-        await(window.ethereum.enable())
-        walletConnected()
+        ethereum.request({ method: 'eth_requestAccounts' }).then(function(res){updateBalance(res[0]);})
 
     }
     catch(error){
@@ -31,15 +27,23 @@ function nometamaskwarn(){
     document.body.insertBefore(newDiv, document.getElementById("buyButton"))
     console.log("Eth wallet not detected")
 }
-function walletConnected(){
+function updateBalance(add){
+    
     element.hidden=true
     element2.hidden=false
     element3.hidden=false
-    document.getElementById("wallet").innerHTML="Wallet connected: "+window.ethereum.selectedAddress
-    setInterval(function(){if (!window.ethereum.isConnected){disconnected();}},100)
-}
+    document.getElementById("wallet").innerHTML="Wallet connected: "+add
+    ethereum.on('accountsChanged', function (accounts) {
+        try{
+        ethereum.request({ method: 'eth_requestAccounts' }).then(function(res){updateBalance(res[0]);})
+        }
+        catch(error){
+            disconnected()
+        }
+    })}
 function disconnected(){
     element.hidden = false
     element2.hidden = true
     element3.hidden = true
+    document.getElementById("wallet").innerHTML="Connection fail, try again"
 }
