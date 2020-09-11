@@ -3,6 +3,7 @@ element2.hidden=true
 var element3 = document.getElementById("sellbutton")
 var element = document.getElementById("con")
 element3.hidden=true
+var disconnect = true
 if (typeof(window.ethereum) === "undefined"){
     nometamaskwarn()
 }
@@ -33,15 +34,23 @@ function updateBalance(add){
     element2.hidden=false
     element3.hidden=false
     document.getElementById("wallet").innerHTML="Wallet connected: "+add
+    disconnect = false
     ethereum.on('accountsChanged', function (accounts) {
-        try{
+    try{
+        if (!disconnect){
         ethereum.request({ method: 'eth_requestAccounts' }).then(function(res){updateBalance(res[0]);})
         }
-        catch(error){
+    }
+    catch(error){
             disconnected()
         }
-    })}
+    })
+    ethereum.on('disconnect', function (accounts) {
+        disconnected()
+    }
+}
 function disconnected(){
+    disconnect = true
     element.hidden = false
     element2.hidden = true
     element3.hidden = true
