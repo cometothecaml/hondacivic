@@ -47,7 +47,7 @@ function updateBalance(add){
     })
     ethereum.on('disconnect', function (accounts) {
         disconnected()
-    }
+    })
 }
 function disconnected(){
     disconnect = true
