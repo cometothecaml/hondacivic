@@ -34,13 +34,7 @@ async function attemptConnect(){
 
     }
     catch(error){
-        const newDiv = document.createElement("div")
-        var newContent = document.createElement("p")
-        newContent.innerHTML="Connection error, reload and try again"
-        newContent.className += "myfont"
-        newDiv.appendChild(newContent)  
-        const currentDiv = document.getElementById("div1")
-        document.body.insertBefore(newDiv, document.getElementById("buyButton"))
-        console.log("connection fail")
+        document.getElementById("wallet").innerHTML="Connection fail, try again"
+
     }
 }
