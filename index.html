@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset = "UTF-8">
+<meta name="viewport" content = "width=device-width, initial-scale=1.0">
+<meta http-equiv = "X-UA-Compatible" content = "ie=edge">
+<title> HondaCivicCoin</title>
+</head> 
+
+<body>
+    <h1 class=myfont>Invest in Honda Civic Coin</h1>
+    <br>
+    <br>
+    <h4 class=myfont>What is Honda Civic Coin?</h4>
+    <br>
+    <br>
+    <p class=myfont>Honda Civic Coin (HCC) is a cryptocurrency pegged to 21,000 DAI. Not exchangeable for an actual Honda Civic yet</p>
+    <br>
+    <br>
+    <h4 class=myfont>How do I buy it?</h4>
+    <br>
+    <br>
+    <p class=myfont>Get <a href = "https://metamask.io" target="_blank">Metamask</a> and then get some <a href = "https://makerdao.com/en/" target="_blank">DAI stablecoin</a>. Then press the Buy HCV button.</p>
+    <br>
+    <br>
+    <br>
+    <button type=button class="connect">Connect Wallet</button>
+    <div>
+    <button type=button class="buy">Buy HCV</button>
+    <button type=button class="sell">Sell HCV</button>
+    <p class = myfont id=wallet>Wallet not connected</p>
+    </div>
+
+    
+</body>
+<style>
+    body {
+      background-image: url('HCV.jpg');
+    }
+    .myfont {
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        background-color: white;
+        color: black;
+        position: absolute;
+
+    }
+    h1{
+        
+        animation-name: test;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+    }
+    button{
+        font-size: 25px;
+    }
+    .buy{
+        background-color: green;
+        color: white
+    }
+    .sell{
+        background-color: red;
+        color: white
+    }
+    .connect{
+        background-color: yellow;
+        color: black
+    }
+    @keyframes test {
+  0%   {background-color:red; left:0px; top:0px;}
+  50%  {background-color:yellow; left:200px; top:0px;}
+  100% {background-color:red; left:0px; top:0px;}
+}
+</style>
+</html>
