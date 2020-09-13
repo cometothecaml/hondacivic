@@ -1,3 +1,42 @@
+window.onload = function() {
+    if (typeof web3 !== 'undefined') {
+      web3 = new Web3(web3.currentProvider);
+    } else {
+      web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io"));
+    }
+    console.log(web3.version);
+  }
+
+  function getERC20TokenBalance(tokenAddress, walletAddress) {
+
+    let minABI = [
+      // balanceOf
+      {
+        "constant":true,
+        "inputs":[{"name":"_owner","type":"address"}],
+        "name":"balanceOf",
+        "outputs":[{"name":"balance","type":"uint256"}],
+        "type":"function"
+      },
+      // decimals
+      {
+        "constant":true,
+        "inputs":[],
+        "name":"decimals",
+        "outputs":[{"name":"","type":"uint8"}],
+        "type":"function"
+      }
+    ];
+
+    let contract = web3.eth.contract(minABI).at(tokenAddress);
+    contract.balanceOf(walletAddress, (error, balance) => {
+      contract.decimals((error, decimals) => {
+        balance = balance.div(10**decimals);
+        document.getElementById("daibalance").innerHTML=balance.toString();
+      });
+    });
+  }
+
 var element2 = document.getElementById("buybutton")
 element2.hidden=true
 var element3 = document.getElementById("sellbutton")
@@ -12,6 +51,8 @@ if (typeof(window.ethereum) === "undefined"){
         }
         else{
             updateBalance(accounts[0])
+            DAIaddress = '0x6b175474e89094c44da98b954eedeac495271d0f'
+            getERC20TokenBalance(DAIaddress, accounts[0], )
         }
     })
 }
