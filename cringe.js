@@ -32,7 +32,7 @@ window.onload = function() {
     contract.balanceOf(walletAddress, (error, balance) => {
       contract.decimals((error, decimals) => {
         balance = balance.div(10**decimals);
-        document.getElementById("daibalance").innerHTML=balance.toString();
+        document.getElementById("daibalance").innerHTML="Your DAI balance: "+balance.toString();
       });
     });
   }
