@@ -2,7 +2,7 @@ window.onload = function() {
     if (typeof web3 !== 'undefined') {
       web3 = new Web3(web3.currentProvider);
     } else {
-      web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io"));
+      web3 = new Web3(new Web3.providers.HttpProvider("https://rinkeby.infura.io"));
     }
     console.log(web3.version);
   }
@@ -28,13 +28,12 @@ window.onload = function() {
       }
     ];
 
-    let contract = web3.eth.contract(minABI).at(tokenAddress);
-    contract.balanceOf(walletAddress, (error, balance) => {
-      contract.decimals((error, decimals) => {
-        balance = balance.div(10**decimals);
-        document.getElementById("daibalance").innerHTML="Your DAI balance: "+balance.toString();
-      });
-    });
+    let contract = web3.eth.Contract(minABI, tokenAddress);
+    var bal = 0
+    contract.methods.balanceOf(walletAddress).call((err, result) => { bal=result })
+    var dec = 0
+    contract.methods.decimals().call((err, result) => { dec=result })
+    return bal/(Math.pow(10.0,dec))
   }
 
 var element2 = document.getElementById("buybutton")
@@ -51,8 +50,13 @@ if (typeof(window.ethereum) === "undefined"){
         }
         else{
             updateBalance(accounts[0])
-            DAIaddress = '0x6b175474e89094c44da98b954eedeac495271d0f'
-            getERC20TokenBalance(DAIaddress, accounts[0], )
+            DAIaddress = '0xdf82c9014f127243ce1305dfe54151647d74b27a'
+            HCVaddress = '0x84943F3547ADE0DcA32bef319E735A83ec0B352c'
+            a=getERC20TokenBalance(DAIaddress, accounts[0], )
+            b=getERC20TokenBalance(HCVaddress, accounts[0], )
+            document.getElementById("daibalance").innerHTML="Your MOON balance: "+ a.toString()
+            document.getElementById("hcvbalance").innerHTML="Your HCV balance: "+ b.toString()
+
         }
     })
 }
@@ -91,3 +95,4 @@ function disconnected(){
     element3.hidden = true
     document.getElementById("wallet").innerHTML="Connection fail, try again"
 }
+
