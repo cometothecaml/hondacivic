@@ -1,4 +1,6 @@
+
 window.onload = function() {
+    var address = "0x00000000000000000000000000000000f00dbaBE"
     if (typeof web3 !== 'undefined') {
       web3 = new Web3(web3.currentProvider);
   
@@ -11,6 +13,7 @@ window.onload = function() {
     if (typeof(window.ethereum) === "undefined"){
         nometamaskwarn()
     }else{
+        setInterval(function(){update()}, 1000)
         ethereum.on('accountsChanged', function (accounts) {
             if (accounts[0]===undefined){
                 disconnected()
@@ -27,7 +30,6 @@ var DAIcontract
 var DAIaddress
 var HCVaddress
 var HCVcontract
-
 var ABIHCV=JSON.parse('[{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"burn","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_subtractedValue","type":"uint256"}],"name":"decreaseApproval","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"tokens","type":"uint256"}],"name":"create","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_addedValue","type":"uint256"}],"name":"increaseApproval","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"civics","type":"uint256"}],"name":"sell","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Burn","type":"event"}]')
 var element = document.getElementById("con")
 var element2 = document.getElementById("buybutton")
@@ -37,6 +39,9 @@ var element2 = document.getElementById("buybutton")
 element3.hidden=true
 
 document.getElementById("con").addEventListener("click", function(){console.log("connect attempt"); attemptConnect();});
+document.getElementById("buybutton").addEventListener("click", function(){buyHCV(0);});
+document.getElementById("sellbutton").addEventListener("click", function(){sellHCV(0);});
+
 async function attemptConnect(){
     try{
         ethereum.request({ method: 'eth_requestAccounts' }).then(function(res){updateBalance(res[0]);})
@@ -57,7 +62,7 @@ function nometamaskwarn(){
     console.log("Eth wallet not detected")
 }
 function updateBalance(add){
-    
+    address = add
     element.hidden=true
     element2.hidden=false
     element3.hidden=false
@@ -304,7 +309,8 @@ function disconnected(){
 
 function buyHCV(num){
     try{
-        DAIcontract.methods.approve(HCVaddress, "21000").send().then(function(){HCVapproved();})
+        DAIcontract.methods.approve(HCVaddress, "21000").send()
+        HCVcontract.methods.create("21000").send()
     }
     catch(err){
         console.log("ERROR!")
@@ -312,12 +318,19 @@ function buyHCV(num){
     }
 
 }
-function HCVapproved(){
+function sellHCV(num){
     try{
-        HCVcontract.methods.create("21000").send()
+        HCVcontract.methods.approve(HCVaddress, "1").send()
+        HCVcontract.methods.sell("1").send()
     }
     catch(err){
+        console.log(err)
         console.log("ERROR!")
         
     }
+
+}
+function update(){
+    console.log(address)
+    updateBalance(address)
 }
