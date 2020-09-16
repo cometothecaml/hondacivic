@@ -19,16 +19,16 @@
     <p class=myfont>Honda Civic Coin (HCV) is a cryptocurrency pegged to 21,000 DAI. Not exchangeable for an actual Honda Civic yet. Also we are bad at coding so don't put too much money in</p>
     <br>
     <br>
+    <br>
     <h4 class=myfont>How do I buy it?</h4>
     <br>
     <br>
-    <p class=myfont>Get <a href = "https://metamask.io" target="_blank">Metamask</a> and then get some <a href = "https://makerdao.com/en/" target="_blank">DAI stablecoin</a>. Then press the Buy HCV button.</p>
+    <p class=myfont>Get <a href = "https://metamask.io" target="_blank">Metamask</a> and then get some <a href = "https://makerdao.com/en/" target="_blank">DAI stablecoin</a>. Connect wallet, then press the Buy HCV button. Enter the amount you want to buy and press execute</p>
+    <br>
     <br>
     <br>
     <br>
     <button type=button class="connect" id="con">Connect Wallet</button>
-   
-    <input type="number" id="quantity" name="quantity" hidden>
     <p class = myfont id=txstatus hidden>Wallet not connected</p>
     <br>
     <br>
@@ -36,6 +36,21 @@
     <button type=button class="buy" id="buybutton">Buy HCV</button>
     <button type=button class="sell" id="sellbutton">Sell HCV</button>
     <br>
+    <br>
+    <div>
+    <label class=myfont id="trade0" hidden>Buy <input type="number" id="quantity" name="quantity" > HCV  for <div id="amt"> 0</div> MOONS</label>
+
+    </div>
+    <p class = myfont id="txerror" hidden>TX Failed</p>
+
+    <br>
+    <br>
+    <br>
+    <div>
+        <button type=button class="execute" id="maxbutton" hidden>Max</button> 
+        <button type=button class="execute" id="executebutton" hidden>Execute</button> 
+        
+    </div>
     <br>
     <p class = myfont id=wallet>Wallet not connected</p>
     <br>
@@ -51,6 +66,16 @@
     <script src="cringe.js"></script>
     <script src="web3.js"></script>
     <style>
+        div{
+            display:inline-block;
+        }
+        label { 
+            float: left; 
+            width:500px;
+        } 
+        input{
+            width: 20%;
+        }
         body {
           background-image: url('HCV.jpg');
         }
@@ -69,6 +94,10 @@
         }
         button{
             font-size: 25px;
+        }
+        .execute{
+            background-color: yellow;
+            color: black
         }
         .buy{
             background-color: green;

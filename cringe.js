@@ -1,6 +1,8 @@
 
 window.onload = function() {
     var address = "0x00000000000000000000000000000000f00dbaBE"
+    var moonbalance = 0
+    var hcvbalance = 0
     if (typeof web3 !== 'undefined') {
       web3 = new Web3(web3.currentProvider);
   
@@ -41,7 +43,67 @@ element3.hidden=true
 document.getElementById("con").addEventListener("click", function(){console.log("connect attempt"); attemptConnect();});
 document.getElementById("buybutton").addEventListener("click", function(){buyHCV(0);});
 document.getElementById("sellbutton").addEventListener("click", function(){sellHCV(0);});
+document.getElementById("quantity").addEventListener("input", function(x){updateBox();})
+document.getElementById("maxbutton").addEventListener("click", function(x){maxBox();})
 
+document.getElementById("executebutton").addEventListener("click", function(x){execute();})
+function execute(){
+    k=document.getElementById("trade0").innerHTML
+    if (k.charAt(0)==="B"){
+        v=document.getElementById("quantity").value
+        if (v===undefined){
+            document.getElementById("txerror").hidden=false
+            document.getElementById("txerror").innerHTML="Nothing entered"
+        }
+        else if(v*21000>moonbalance){
+            document.getElementById("txerror").hidden=false
+            document.getElementById("txerror").innerHTML="Balance too low"
+        }
+        else{
+            document.getElementById("txerror").hidden=true
+            DAIcontract.methods.approve(HCVaddress, v*21000).send().catch(function (err){txfail();})
+            HCVcontract.methods.create(v*21000).send().catch(function (err){txfail();})
+        }
+    }
+    else{
+        v=document.getElementById("quantity").value
+        if (v===undefined){
+            document.getElementById("txerror").hidden=false
+            document.getElementById("txerror").innerHTML="Nothing entered"
+        }
+        else if(v>hcvbalance){
+            document.getElementById("txerror").hidden=false
+            document.getElementById("txerror").innerHTML="Balance too low"
+        }
+        else{
+            document.getElementById("txerror").hidden=true
+            DAIcontract.methods.approve(HCVaddress, v).send().catch(function (err){txfail();})
+            HCVcontract.methods.sell(v).send().catch(function (err){txfail();})
+        }
+    }
+}
+function txfail(){
+    document.getElementById("txerror").hidden=false
+    document.getElementById("txerror").innerHTML="TX failed"
+
+}
+function updateBox(){
+    k=document.getElementById("trade0").innerHTML
+
+    document.getElementById("amt").innerHTML=parseFloat(document.getElementById("quantity").value)*21000
+
+}
+function maxBox(){
+    k=document.getElementById("trade0").innerHTML
+    if (k.charAt(0)==="B"){
+        document.getElementById("quantity").value=moonbalance/21000
+        updateBox()
+    }
+    else{
+        document.getElementById("quantity").value=hcvbalance
+        updateBox()
+    }
+}
 async function attemptConnect(){
     try{
         ethereum.request({ method: 'eth_requestAccounts' }).then(function(res){updateBalance(res[0]);})
@@ -62,10 +124,14 @@ function nometamaskwarn(){
     console.log("Eth wallet not detected")
 }
 function updateBalance(add){
+   
     address = add
     element.hidden=true
     element2.hidden=false
     element3.hidden=false
+    document.getElementById("trade0").hidden = false
+    document.getElementById("maxbutton").hidden = false
+    document.getElementById("executebutton").hidden = false
     document.getElementById("wallet").innerHTML="Wallet connected: "+add
     ercabi = JSON.parse(`[
         {
@@ -294,43 +360,56 @@ function updateBalance(add){
      DAIaddress = "0xDF82c9014F127243CE1305DFE54151647d74B27A"
      HCVcontract=new web3.eth.Contract(ABIHCV, HCVaddress, {from:add, gasPrice:1000000000})
      DAIcontract=new web3.eth.Contract(ercabi, DAIaddress, {from:add, gasPrice:1000000000})
-     DAIcontract.methods.balanceOf(add).call().then(function(res){document.getElementById("daibalance").innerHTML = "Your MOON balance: "+res;})
-     HCVcontract.methods.balanceOf(add).call().then(function(res){document.getElementById("hcvbalance").innerHTML = "Your HCV balance: "+res;})
+     DAIcontract.methods.balanceOf(add).call().then(function(res){moonbalance = res;document.getElementById("daibalance").innerHTML = "Your MOON balance: "+res;})
+     HCVcontract.methods.balanceOf(add).call().then(function(res){hcvbalance = res;document.getElementById("hcvbalance").innerHTML = "Your HCV balance: "+res;})
 
         
 
 }
 function disconnected(){
+    address=undefined
     element.hidden = false
     element2.hidden = true
     element3.hidden = true
-    document.getElementById("wallet").innerHTML="Connection fail, try again"
+    document.getElementById("trade0").hidden = true
+    document.getElementById("maxbutton").hidden = true
+    document.getElementById("executebutton").hidden = true
+    document.getElementById("wallet").innerHTML="Wallet disconnected"
 }
 
 function buyHCV(num){
-    try{
-        DAIcontract.methods.approve(HCVaddress, "21000").send()
-        HCVcontract.methods.create("21000").send()
-    }
-    catch(err){
-        console.log("ERROR!")
+    // try{
+    //     DAIcontract.methods.approve(HCVaddress, "21000").send()
+    //     HCVcontract.methods.create("21000").send()
+    // }
+    // catch(err){
+    //     console.log("ERROR!")
         
-    }
+    // }
+    document.getElementById("trade0").innerHTML='Buy <input type="number" id="quantity" name="quantity" > HCV for <div id="amt"> 0</div> MOONS'
+    document.getElementById("quantity").addEventListener("input", function(x){updateBox();})
+
 
 }
 function sellHCV(num){
-    try{
-        HCVcontract.methods.approve(HCVaddress, "1").send()
-        HCVcontract.methods.sell("1").send()
-    }
-    catch(err){
-        console.log(err)
-        console.log("ERROR!")
+    // try{
+    //     HCVcontract.methods.approve(HCVaddress, "1").send()
+    //     HCVcontract.methods.sell("1").send()
+    // }
+    // catch(err){
+    //     console.log(err)
+    //     console.log("ERROR!")
         
-    }
+    // }
+    document.getElementById("trade0").innerHTML=`Sell <input type="number" id="quantity" name="quantity" > HCV for <div id="amt"> 0</div> MOONS`
+    document.getElementById("quantity").addEventListener("input", function(x){updateBox();})
+
+
+
 
 }
 function update(){
-    console.log(address)
+    if (typeof(address) !== "undefined"){
     updateBalance(address)
+}
 }
