@@ -55,7 +55,7 @@ function execute(){
             document.getElementById("txerror").hidden=false
             document.getElementById("txerror").innerHTML="Nothing entered"
         }
-        else if(v*21000>moonbalance){
+        else if(parseInt(v)*21000>parseInt(moonbalance)){
             document.getElementById("txerror").hidden=false
             document.getElementById("txerror").innerHTML="Balance too low"
         }
@@ -71,7 +71,7 @@ function execute(){
             document.getElementById("txerror").hidden=false
             document.getElementById("txerror").innerHTML="Nothing entered"
         }
-        else if(v>hcvbalance){
+        else if(parseInt(v)>parseInt(hcvbalance)){
             document.getElementById("txerror").hidden=false
             document.getElementById("txerror").innerHTML="Balance too low"
         }
