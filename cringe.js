@@ -1,8 +1,16 @@
 
+
 window.onload = function() {
     var address = "0x00000000000000000000000000000000f00dbaBE"
     var moonbalance = 0
     var hcvbalance = 0
+     element = document.getElementById("con")
+ element2 = document.getElementById("buybutton")
+element2.hidden=true
+ element3 = document.getElementById("sellbutton")
+element3.hidden=true
+console.log("lol")
+    element3.hidden=true
     if (typeof web3 !== 'undefined') {
       web3 = new Web3(web3.currentProvider);
   
@@ -15,6 +23,7 @@ window.onload = function() {
     if (typeof(window.ethereum) === "undefined"){
         nometamaskwarn()
     }else{
+        exchangerate= new web3.utils.BN(21000)
         setInterval(function(){update()}, 1000)
         ethereum.on('accountsChanged', function (accounts) {
             if (accounts[0]===undefined){
@@ -32,13 +41,12 @@ var DAIcontract
 var DAIaddress
 var HCVaddress
 var HCVcontract
+var  exchangerate 
+var element
+var element2
+var element3
 var ABIHCV=JSON.parse('[{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"burn","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_subtractedValue","type":"uint256"}],"name":"decreaseApproval","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"tokens","type":"uint256"}],"name":"create","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_addedValue","type":"uint256"}],"name":"increaseApproval","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"civics","type":"uint256"}],"name":"sell","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Burn","type":"event"}]')
-var element = document.getElementById("con")
-var element2 = document.getElementById("buybutton")
- element2.hidden=true
- var element3 = document.getElementById("sellbutton")
- var element = document.getElementById("con")
-element3.hidden=true
+
 
 document.getElementById("con").addEventListener("click", function(){console.log("connect attempt"); attemptConnect();});
 document.getElementById("buybutton").addEventListener("click", function(){buyHCV(0);});
@@ -49,21 +57,23 @@ document.getElementById("maxbutton").addEventListener("click", function(x){maxBo
 document.getElementById("executebutton").addEventListener("click", function(x){execute();})
 function execute(){
     k=document.getElementById("trade0").innerHTML
-    if (k.charAt(0)==="B"){
+    if (k.charAt(1)==="p"){
         v=document.getElementById("quantity").value
         if (v===undefined){
             document.getElementById("txerror").hidden=false
             document.getElementById("txerror").innerHTML="Nothing entered"
         }
-        else if(parseInt(v)*21000>parseInt(moonbalance)){
+        else {
+            v=new web3.utils.BN(v)
+            if(v.gt(new web3.utils.BN(moonbalance))){
             document.getElementById("txerror").hidden=false
             document.getElementById("txerror").innerHTML="Balance too low"
         }
         else{
             document.getElementById("txerror").hidden=true
-            DAIcontract.methods.approve(HCVaddress, v*21000).send().catch(function (err){txfail();})
-            HCVcontract.methods.create(v*21000).send().catch(function (err){txfail();})
-        }
+            DAIcontract.methods.approve(HCVaddress, v.div(exchangerate).mul(exchangerate)).send().catch(function (err){txfail();})
+            HCVcontract.methods.create(v.div(exchangerate).mul(exchangerate)).send().catch(function (err){txfail();})
+        }}
     }
     else{
         v=document.getElementById("quantity").value
@@ -71,15 +81,18 @@ function execute(){
             document.getElementById("txerror").hidden=false
             document.getElementById("txerror").innerHTML="Nothing entered"
         }
-        else if(parseInt(v)>parseInt(hcvbalance)){
+        else {
+            v=new web3.utils.BN(v)
+            if(v.gt(new web3.utils.BN(hcvbalance))){
             document.getElementById("txerror").hidden=false
             document.getElementById("txerror").innerHTML="Balance too low"
         }
         else{
             document.getElementById("txerror").hidden=true
-            DAIcontract.methods.approve(HCVaddress, v).send().catch(function (err){txfail();})
-            HCVcontract.methods.sell(v).send().catch(function (err){txfail();})
+            DAIcontract.methods.approve(HCVaddress, v.toString()).send().catch(function (err){txfail();})
+            HCVcontract.methods.sell(v.toString()).send().catch(function (err){txfail();})
         }
+    }
     }
 }
 function txfail(){
@@ -89,14 +102,17 @@ function txfail(){
 }
 function updateBox(){
     k=document.getElementById("trade0").innerHTML
-
-    document.getElementById("amt").innerHTML=parseFloat(document.getElementById("quantity").value)*21000
-
+    if (k.charAt(1)==="p"){
+        document.getElementById("amt").innerHTML=new web3.utils.BN(document.getElementById("quantity").value).div(exchangerate).toString()
+    }
+    else{
+        document.getElementById("amt").innerHTML=new web3.utils.BN(document.getElementById("quantity").value).mul(exchangerate).toString()
+    }
 }
 function maxBox(){
     k=document.getElementById("trade0").innerHTML
-    if (k.charAt(0)==="B"){
-        document.getElementById("quantity").value=moonbalance/21000
+    if (k.charAt(1)==="p"){
+        document.getElementById("quantity").value=moonbalance
         updateBox()
     }
     else{
@@ -115,6 +131,9 @@ async function attemptConnect(){
 function nometamaskwarn(){
     element.hidden=true
     const newDiv = document.createElement("div")
+    newDiv.appendChild(document.createElement("br"))
+
+    newDiv.appendChild(document.createElement("br"))
     var newContent = document.createElement("p")
     newContent.innerHTML="Please install Metamask to continue. Reload when done"
     newContent.className += "myfont"
@@ -386,7 +405,7 @@ function buyHCV(num){
     //     console.log("ERROR!")
         
     // }
-    document.getElementById("trade0").innerHTML='Buy <input type="number" id="quantity" name="quantity" > HCV for <div id="amt"> 0</div> MOONS'
+    document.getElementById("trade0").innerHTML='Spend <input type="number" id="quantity" name="quantity" > MOONS for <div id="amt"> 0</div> HCV'
     document.getElementById("quantity").addEventListener("input", function(x){updateBox();})
 
 
